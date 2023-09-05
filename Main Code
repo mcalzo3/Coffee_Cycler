@@ -1,0 +1,257 @@
+//COFFEE MACHINE CYCLE TESTING CODE
+//Since this test system is run with an Arduino Mega (single core), 'Blink without delay function' is used to run blocks simultaneously 
+//to make sure no sensors are being blocked by delays
+
+
+
+
+//LCD I2C address
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27,20,4); 
+
+
+//4 pumps connected to digital pins
+int Pump1 5;
+int Pump2 6;
+int Pump3 7;
+int Pump4 8;
+
+
+//4 toggle switches to turn machines on for testing
+int button1 = 9;
+int button2 = 10;
+int button3 = 11;
+int button4 = 12;
+
+//4 float sensors 
+int float1 = 13;
+int float2 = 14;
+int float3 = 15;
+int float4 = 16; 
+
+//relay pins to control pumps on/off
+int relay1 = 22;
+int realy2 = 24;
+int realy3 = 25;
+int relay4 = 26;
+
+int button1_state = 0;
+int button2_state = 0;
+int button3_state = 0;
+int button4_state = 0;
+
+int float1_state = 0;
+int float2_state = 0;
+int float3_state = 0;
+int float4_state = 0;
+
+
+
+// Timing blocks for delay functions
+unsigned long previousMillis = 0;
+unsigned long brew_Time = 900000; 
+unsigned long Cooldown_Time = 6000; 
+unsigned long toggle_check = 10;
+
+
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  // Setup of all of the pins. uses a fair few
+
+  
+  pinMode(Pump1, OUTPUT);
+  pinMode(Pump2, OUTPUT);
+  pinMode(Pump3, OUTPUT);
+  pinMode(Pump4, OUTPUT);
+
+  pinMode(button1, INPUT);
+  pinMode(button2, INPUT);
+  pinMode(button3, INPUT);
+  pinMode(button4, INPUT);
+
+  pinMode(float1, OUTPUT);
+  pinMode(float2, OUTPUT);
+  pinMode(float3, OUTPUT);
+  pinMode(float4, OUTPUT);
+
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+  pinMode(relay4, OUTPUT);
+
+
+// Turns on the screen
+  lcd.init(); // Initializes the interface to the LCD screen, and specifies the dimensions (width and height) of the display }
+  lcd.backlight();
+  lcd.print("Press toggle switch to choose which coffee machines to cycle test");
+  delay(1000);
+  lcd.clear();
+  //lcd.backlight();
+
+}
+
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  lcd.clear();
+
+  //call toggle switch function
+  toggle_switch();
+
+  //call relay function to turn on pumps
+  relay();
+
+  //run pumps until float sensors are triggered
+  float_sensors();
+
+  //wait ten minuted while machines brew one full cycle of coffee
+  brew();
+
+
+
+
+}
+
+//checks all 4 toggle switche states every 1 second
+void toggle_switch(){
+
+  unsigned long currentMillis = millis();
+
+  //continosuly check which switches have been pressed to begin cycle testing
+  if(currentMillis - previousMillis >= toggle_check){
+
+    if(button1 == HIGH){
+      button1_state = 1;
+    }
+    else 
+      button1_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(button2 == HIGH){
+      button2_state = 1;
+    }
+    else 
+      button2_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(button3 == HIGH){
+      button3_state = 1;
+    }
+    else 
+      button3_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(button4 == HIGH){
+      button4_state = 1;
+    }
+    else 
+      button4_state = 0;
+  }
+
+}
+
+//checks all 4 float sensors states every 1 second
+void float_sensors(){
+
+  unsigned long currentMillis = millis();
+
+  //continosuly check which switches have been pressed to begin cycle testing
+  if(currentMillis - previousMillis >= toggle_check){
+
+
+ 
+    if(digitalRead(float1) == HIGH){
+      float1_state = 1;
+    }
+    else 
+      float1_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(digitalRead(float2) == HIGH){
+      float2_state = 1;
+    }
+    else 
+      float2_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(digitalRead(float3) == HIGH){
+      float3_state = 1;
+    }
+    else 
+      float3_state = 0;
+  }
+
+    if(currentMillis - previousMillis >= toggle_check){
+
+    if(digitalRead(float4) == HIGH){
+      float4_state = 1;
+    }
+    else 
+      float4_state = 0;
+  }
+
+}
+
+
+void relay(){
+
+//if toggle switch is on, run the relay that runs the pump until a float sensor is triggered
+  if(button1_state == 1 && float1_state == 0){
+    digitalWrite(relay1, HIGH);
+  }
+  else{
+    digitalWrite(relay1, LOW);
+  }
+
+  if(button2_state == 1 && float2_state == 0){
+    digitalWrite(relay2, HIGH);
+  }
+  else{
+    digitalWrite(relay2, LOW);
+  }
+
+  if(button3_state == 1 && float3_state == 0){
+    digitalWrite(relay3, HIGH);
+  }
+  else{
+    digitalWrite(relay3, LOW);
+  }
+  
+  if(button4_state == 1 && float4_state == 0){
+    digitalWrite(relay4, HIGH);
+  }
+  else{
+    digitalWrite(relay4, LOW);
+  }
+
+  unsigned long wait_period = millis();
+
+
+
+}
+
+void brew(){
+
+  //wait time while cycle brewsd, about 10 minutes
+  if(currentMillis - wait_period <= brew_time){
+  lcd.print("Machines are brewing");
+
+  }
+
+
+}
+
